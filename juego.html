@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BigBet</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        color: #333;
+    }
+    #video-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        object-fit: cover;
+    }
+    .overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(128, 128, 128, 0.5);
+        padding: 20px;
+        border-radius: 10px;
+    }
+    .content {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+    }
+    h1 {
+        color: #333;
+        text-shadow: 2px 2px 2px rgba(0,0,0,0.1);
+    }
+    #score {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #007bff;
+        transition: color 0.3s ease-in-out;
+    }
+    input[type="number"] {
+        padding: 10px;
+        font-size: 16px;
+        margin-bottom: 10px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        background: transparent;
+        color: #333;
+    }
+    input[type="number"]::placeholder {
+        color: #007bff; /* Color del placeholder */
+        opacity: 0.7; /* Opacidad del placeholder */
+    }
+    button, a.button {
+        padding: 10px 20px;
+        font-size: 18px;
+        margin: 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease-in-out;
+        text-decoration: none; /* Elimina subrayado en el enlace */
+        display: inline-block; /* Hace que el enlace se comporte como un bloque */
+    }
+    button:hover, a.button:hover {
+        background-color: #0056b3;
+    }
+    #mensaje {
+        font-size: 18px;
+        margin-top: 20px;
+        color: #dc3545; /* Color del mensaje de error */
+    }
+    .success {
+        color: #28a745; /* Color del mensaje de éxito */
+    }
+    .error {
+        color: #dc3545; /* Color del mensaje de error */
+    }
+    .logo {
+        width: 100px;
+        vertical-align: middle;
+    }
+    .footer {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    .footer p {
+        margin: 5px;
+        font-size: 14px;
+    }
+</style>
+</head>
+<body>
+    <video autoplay muted loop id="video-background">
+        <source src="videof.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <div class="overlay">
+        <div class="content">
+            <h1>BigBet</h1>
+            <div id="score">100 <img src="Coin.jpg" alt="Coin" class="logo"></div>
+            <input type="number" id="cantidad" placeholder="Ingresar cantidad">
+            <button onclick="apostar()">Apostar</button>
+
+            <!-- Agregamos un enlace para ir al menú -->
+            <a href="index.html" class="button">Ir al Menú</a>
+            
+            <!-- Div para mostrar mensajes -->
+            <div id="mensaje"></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>RobleGames</p>
+        <p>@robleuy</p>
+    </div>
+
+    <script>
+        var saldo = localStorage.getItem("saldo") ? parseInt(localStorage.getItem("saldo")) : 100;
+        actualizarSaldo();
+
+        function apostar() {
+            var cantidad = parseInt(document.getElementById("cantidad").value);
+            if (isNaN(cantidad) || cantidad <= 0) {
+                mostrarMensaje("Ingrese una cantidad válida para apostar.");
+                return;
+            }
+            if (cantidad > saldo) {
+                mostrarMensaje("No tienes suficiente saldo para esta apuesta.");
+                return;
+            }
+
+            var resultado = Math.random();
+            if (resultado < 0.5) {
+                saldo += cantidad;
+                mostrarMensaje("¡Ganaste 😀 " + cantidad + "!", true);
+            } else {
+                saldo -= cantidad;
+                if (saldo <= 0) {
+                    reiniciarJuego(); // Redirige al jugador a la página perdiste.html
+                } else {
+                    mostrarMensaje("Has perdido 😔 " + cantidad + ".", false);
+                }
+            }
+            actualizarSaldo();
+            localStorage.setItem("saldo", saldo);
+        }
+
+        function actualizarSaldo() {
+            var scoreElement = document.getElementById("score");
+            scoreElement.textContent = saldo;
+            scoreElement.className = saldo > 100 ? "success" : saldo < 100 ? "error" : "";
+        }
+
+        function reiniciarJuego() {
+            window.location.href = "perdiste.html"; // Redirige al jugador a la página perdiste.html
+            saldo = 100;
+            localStorage.setItem("saldo", saldo);
+        }
+
+        function mostrarMensaje(mensaje, exito) {
+            var mensajeElement = document.getElementById("mensaje");
+            mensajeElement.textContent = mensaje;
+            mensajeElement.className = exito ? "success" : "error";
+        }
+    </script>
+</body>
+</html>
